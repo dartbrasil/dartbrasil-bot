@@ -9,6 +9,7 @@ environment:
 
 dependencies:
   teledart: ^0.0.22
+  dotenv: ^1.0.0
 
 dev_dependencies:
   test: ^1.0.0
