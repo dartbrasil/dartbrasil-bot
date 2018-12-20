@@ -1,3 +1,4 @@
+import 'package:dartbrasil_bot/services/pub_service.dart';
 import 'package:dotenv/dotenv.dart' show load, env;
 
 import 'package:teledart/model.dart';
@@ -6,32 +7,35 @@ import 'package:teledart/telegram.dart';
 
 void start() {
   load();
-  TeleDart teledart = new TeleDart(new Telegram(env['TG_TOKEN']), new Event());
+  TeleDart bot = new TeleDart(new Telegram(env['TG_TOKEN']), new Event());
 
-  teledart.startFetching();
+  bot.startFetching();
 
-  // You can listen to messages like this
-  teledart
+  bot
     .onMessage(entityType: 'bot_command', keyword: 'start')
     .listen((message) {
-      teledart.telegram.sendMessage(message.from.id, 'Como vai? Sou o bot do Dart Brasil no Telegram.');
+      bot.telegram.sendMessage(message.from.id, 'Como vai? Sou o bot do Dart Brasil no Telegram.');
     });
 
-  // You can even filter streams even more diverse with stream processing methods
-  // See: https://www.dartlang.org/tutorials/language/streams#methods-that-modify-a-stream
-  teledart
+  bot
       .onMessage(keyword: 'dart')
       .where((Message message) => message.text.contains('telegram'))
       .listen((message) {
-    teledart.replyPhoto(
+    bot.replyPhoto(
         message,
 //            new io.File('example/dart_bird_catchs_telegram.png'),
         'https://raw.githubusercontent.com/DinoLeung/TeleDart/master/example/dart_bird_catchs_telegram.png',
         caption: 'This is how the Dart Bird and Telegram are met');
   });
+  
+  bot
+    .onCommand('search')
+    .listen((message) {
+      bot.telegram.sendMessage(message.from.id, PubService.searchPackage(message.text), reply_to_message_id: message.message_id);
+  });
 
   // Inline mode
-  teledart.onInlineQuery().listen((inlineQuery) {
+  bot.onInlineQuery().listen((inlineQuery) {
     List<InlineQueryResult> results = [
       new InlineQueryResultArticle()
         ..id = 'ping'
@@ -46,6 +50,6 @@ void start() {
           ..message_text = '_dong_'
           ..parse_mode = 'markdown')
     ];
-    teledart.answerInlineQuery(inlineQuery, results);
+    bot.answerInlineQuery(inlineQuery, results);
   });
 }
