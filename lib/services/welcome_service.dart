@@ -5,7 +5,14 @@ String welcomeAboard(User user) {
 }
 
 String welcomeAboardMessage(Message message) {
-  return 'Seja bem vindo ao grupo, ${message.from.first_name}';
+  switch (message.chat.type) {
+    case 'private':
+      return 'Olá ${message.from.first_name}, sou o bot do grupo Dart Brasil.';
+      break;
+    default:
+      return 'Seja bem vindo ao grupo, ${message.from.first_name}';
+      break;
+  }
 }
 
 String goodbye(User user) {

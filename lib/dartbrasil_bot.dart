@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:dartbrasil_bot/services/pub_service.dart';
 import 'package:dartbrasil_bot/services/welcome_service.dart';
 import 'package:dartbrasil_bot/services/mention_service.dart';
@@ -47,24 +45,24 @@ void start() {
     .onMention('dartbrasilbot')
     .listen(andAnswerWith(mentionMember));
 
-  // Inline mode
-  bot
-    .onInlineQuery()
-    .listen((inlineQuery) {
-      List<InlineQueryResult> results = [
-        new InlineQueryResultArticle()
-          ..id = 'ping'
-          ..title = 'ping'
-          ..input_message_content = (new InputTextMessageContent()
-            ..message_text = '*pong*'
-            ..parse_mode = 'markdown'),
-        new InlineQueryResultArticle()
-          ..id = 'ding'
-          ..title = 'ding'
-          ..input_message_content = (new InputTextMessageContent()
-            ..message_text = '_dong_'
-            ..parse_mode = 'markdown')
-      ];
-      bot.answerInlineQuery(inlineQuery, results);
-    });
+  // // Inline mode
+  // bot
+  //   .onInlineQuery()
+  //   .listen((inlineQuery) {
+  //     List<InlineQueryResult> results = [
+  //       new InlineQueryResultArticle()
+  //         ..id = 'ping'
+  //         ..title = 'ping'
+  //         ..input_message_content = (new InputTextMessageContent()
+  //           ..message_text = '*pong*'
+  //           ..parse_mode = 'markdown'),
+  //       new InlineQueryResultArticle()
+  //         ..id = 'ding'
+  //         ..title = 'ding'
+  //         ..input_message_content = (new InputTextMessageContent()
+  //           ..message_text = '_dong_'
+  //           ..parse_mode = 'markdown')
+  //     ];
+  //     bot.answerInlineQuery(inlineQuery, results);
+  //   });
 }
