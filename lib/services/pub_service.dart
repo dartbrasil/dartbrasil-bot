@@ -1,6 +1,6 @@
-class PubService {
-  static String searchPackage(String message) {
-    String formattedMessage = message.substring(8).split(' ').join('+');
-    return 'https://pub.dartlang.org/packages?q=$formattedMessage';
-  }
+import 'package:teledart/model.dart';
+
+String searchPackage(Message message) {
+  String formattedMessage = message.text.substring(8).split(' ').join('+');
+  return 'https://pub.dartlang.org/packages?q=$formattedMessage';
 }

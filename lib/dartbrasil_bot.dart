@@ -1,4 +1,9 @@
+import 'dart:async';
+
 import 'package:dartbrasil_bot/services/pub_service.dart';
+import 'package:dartbrasil_bot/services/welcome_service.dart';
+import 'package:dartbrasil_bot/services/mention_service.dart';
+import 'package:dartbrasil_bot/utils/message_handler.dart';
 import 'package:dotenv/dotenv.dart' show load, env;
 
 import 'package:teledart/model.dart';
@@ -7,15 +12,21 @@ import 'package:teledart/telegram.dart';
 
 void start() {
   load();
-  TeleDart bot = new TeleDart(new Telegram(env['TG_TOKEN']), new Event());
+  TeleDart bot = new TeleDart(new Telegram(env['TG_TOKEN']), new Event(sync: true));
+
+  Function andAnswerWith = answer(bot);
+  Function andReplyWith = reply(bot);
+  Function andTakeDefaultActions = def(bot);
 
   bot.startFetching();
 
   bot
+    .onMessage()
+    .listen(andTakeDefaultActions);
+
+  bot
     .onMessage(entityType: 'bot_command', keyword: 'start')
-    .listen((message) {
-      bot.telegram.sendMessage(message.from.id, 'Como vai? Sou o bot do Dart Brasil no Telegram.');
-    });
+    .listen(andAnswerWith(welcomeAboardMessage));
 
   bot
       .onMessage(keyword: 'dart')
@@ -30,26 +41,30 @@ void start() {
   
   bot
     .onCommand('search')
-    .listen((message) {
-      bot.telegram.sendMessage(message.from.id, PubService.searchPackage(message.text), reply_to_message_id: message.message_id);
-  });
+    .listen(andReplyWith(searchPackage));
+
+  bot
+    .onMention('dartbrasilbot')
+    .listen(andAnswerWith(mentionMember));
 
   // Inline mode
-  bot.onInlineQuery().listen((inlineQuery) {
-    List<InlineQueryResult> results = [
-      new InlineQueryResultArticle()
-        ..id = 'ping'
-        ..title = 'ping'
-        ..input_message_content = (new InputTextMessageContent()
-          ..message_text = '*pong*'
-          ..parse_mode = 'markdown'),
-      new InlineQueryResultArticle()
-        ..id = 'ding'
-        ..title = 'ding'
-        ..input_message_content = (new InputTextMessageContent()
-          ..message_text = '_dong_'
-          ..parse_mode = 'markdown')
-    ];
-    bot.answerInlineQuery(inlineQuery, results);
-  });
+  bot
+    .onInlineQuery()
+    .listen((inlineQuery) {
+      List<InlineQueryResult> results = [
+        new InlineQueryResultArticle()
+          ..id = 'ping'
+          ..title = 'ping'
+          ..input_message_content = (new InputTextMessageContent()
+            ..message_text = '*pong*'
+            ..parse_mode = 'markdown'),
+        new InlineQueryResultArticle()
+          ..id = 'ding'
+          ..title = 'ding'
+          ..input_message_content = (new InputTextMessageContent()
+            ..message_text = '_dong_'
+            ..parse_mode = 'markdown')
+      ];
+      bot.answerInlineQuery(inlineQuery, results);
+    });
 }
